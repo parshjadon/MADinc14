@@ -1,0 +1,33 @@
+﻿{
+    "project_info":  {
+                         "project_number":  "521308327043",
+                         "project_id":  "temp-fc580",
+                         "storage_bucket":  "temp-fc580.firebasestorage.app"
+                     },
+    "client":  [
+                   {
+                       "client_info":  {
+                                           "mobilesdk_app_id":  "1:521308327043:android:36c505b4c8c3be43dd5fb6",
+                                           "android_client_info":  {
+                                                                       "package_name":  "com.parshjadon.cloud_courier"
+                                                                   }
+                                       },
+                       "oauth_client":  [
+
+                                        ],
+                       "api_key":  [
+                                       {
+                                           "current_key":  "AIzaSyC-TV70AF2CDaNLdd_F_n2Y8IViprlDF0w"
+                                       }
+                                   ],
+                       "services":  {
+                                        "appinvite_service":  {
+                                                                  "other_platform_oauth_client":  [
+
+                                                                                                  ]
+                                                              }
+                                    }
+                   }
+               ],
+    "configuration_version":  "1"
+}
