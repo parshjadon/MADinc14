@@ -8,6 +8,10 @@ without displaying or logging it.
 
 **Submission:** [answers, reflection, payload, four result rows, and limitations](SUBMISSION.md).
 
+**LMS upload:** [final submission PDF](output/pdf/Cloud_Courier_Submission.pdf), including
+the written answers and all four labeled device-test evidence composites. T1-T4 passed
+on a Samsung SM-S938U1 running Android 17 with notification permission authorized.
+
 ## Run
 
 Use Flutter 3.47.2 / Dart 3.13.2 or a compatible newer SDK and an Android target with

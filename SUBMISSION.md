@@ -7,40 +7,42 @@
 - **Platform:** Android, package `com.parshjadon.cloud_courier`
 - **Firebase project:** `temp-fc580`
 
+**Upload document:** [Final submission PDF](output/pdf/Cloud_Courier_Submission.pdf).
+The PDF includes the reflection, payload, four result rows, four labeled evidence
+composites, and optional written answers. Original screenshot content is preserved;
+the composites arrange screenshots for comparison without changing app content.
+
 ## Required reflection responses
 
 ### 1. Setup and payload
 
-The implementation targets Android only, using a separately registered package and
-FlutterFire-generated options to avoid a project/app mismatch. Firebase initialization
-finishes before messaging registration and widget startup. Core 4.x and Messaging 16.x
-retain the course's registration-token API. The string `action=update_ui` permits a
-content update; `asset=default` or `asset=promo` selects one of two bundled images.
-The notification title supplies the heading. An allowlist is simpler and safer than
-constructing an arbitrary asset path. A token addresses an installation; neither the
-token nor successful message delivery grants authorization to protected resources.
+The app targets Android with a separately registered package and FlutterFire-generated
+options to prevent project mismatches. Firebase initialization finishes before messaging
+registration and widget startup. Core 4.x and Messaging 16.x retain the course's token
+API. The string `action=update_ui` permits an update; `asset=default` or `asset=promo`
+selects a bundled image. The notification title supplies the heading. An allowlist avoids
+arbitrary asset paths. A token addresses an installation; delivery does not authorize
+access to protected resources.
 
 ### 2. Lifecycle and evidence
 
-`onMessage` handles foreground receipt, `onMessageOpenedApp` handles a background
-notification tap, and `getInitialMessage()` handles a notification-triggered cold start.
-The separate `onBackgroundMessage` callback performs non-UI work; Android runs it in
-another isolate, so it cannot update foreground widget state. Automated callback tests
-verify UI behavior. T1 screenshots show `onMessage`, count 1, and the promo image.
-T2 shows the delivered notification, then `onMessageOpenedApp`, count 2, and expected
-content. T3 shows `getInitialMessage`, count 1, and expected content after a new launch.
-T4 still awaits device evidence.
-Android force-stop prevents delivery until reopening; one device's results cannot
-establish universal platform reliability.
+`onMessage` handles foreground receipt, `onMessageOpenedApp` handles a background tap,
+and `getInitialMessage()` handles a notification-triggered cold start. Android executes
+the separate `onBackgroundMessage` callback in another isolate, preventing direct widget
+updates. T1 shows `onMessage`, count 1, and promo content; T2 shows the notification
+followed by `onMessageOpenedApp`, count 2; T3 shows `getInitialMessage`, count 1, and
+expected content on a new launch. These notification-plus-data results do not establish
+data-only reliability. Android force-stop blocks delivery until reopening; one phone
+cannot establish universal platform behavior.
 
 ### 3. Validation and next step
 
-T4 uses `asset=unknown`. Automated checks observe a rejection diagnostic while the
-previous title/image survive and receipt metadata advances. Lifetime guards prevent
-late callbacks from changing disposed widgets; service disposal cancels listeners.
-The next step is recording T4 on the connected phone, including its before/after
-comparison. AI assisted the implementation, automated tests, and written responses;
-the student supplied the T1–T3 device screenshots.
+T4 changes `asset` to `unknown`: its screenshot shows rejection, `onMessage`, and count
+2 while preserving T3's title/image. Lifetime guards prevent callbacks from changing
+disposed widgets; disposal cancels listeners. Repeated content is harmless here, but
+business operations would benefit from event-ID deduplication: sending the same ID
+twice should produce one operation. AI assisted the code, automated tests, and writing;
+the student supplied T1-T4 device screenshots.
 
 ## Device, permission, and payload record
 
@@ -74,24 +76,17 @@ remain outside the Flutter application.
 
 | Test | Expected handler/result | Observed result | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| T1 — foreground | `onMessage`; title becomes Campus event update, promo image appears, receipt count advances | Before: default title/image, no handler, count 0. After: `onMessage`, count 1, Campus event update, promo image, and Applied payload: asset=promo | Pass | [Before](evidence/T1-before.jpg), [foreground result](evidence/T1-foreground.jpg) |
-| T2 — background tap | Delivered notification is tapped; `onMessageOpenedApp`; fresh receipt and expected UI | Cloud Courier notification appears at 21:05. After opening: `onMessageOpenedApp`, count 2, fresh message ID, Campus event update, promo image, and Applied payload: asset=promo | Pass | [Delivered notification](evidence/T2-notification.jpg), [background-open result](evidence/T2-background-open.jpg) |
-| T3 — cold-start tap | Notification launches terminated app; `getInitialMessage`; count 1 and expected UI | Notification delivered at 21:09; opened app shows `getInitialMessage`, count 1 on the new launch, fresh message ID, Campus event update, promo image, and Applied payload: asset=promo | Pass | [Delivered notification](evidence/T3-notification.jpg), [cold-start result](evidence/T3-cold-start.jpg) |
-| T4 — unsupported asset | `onMessage`; rejection diagnostic; count advances; previous title/image preserved; no crash | Callback/UI test passed with `asset=unknown`; real device rejection has not yet been evidenced | Pending device evidence | [Automated validation test](test/message_handling_test.dart); device evidence not supplied |
+| T1 — foreground | `onMessage`; title becomes Campus event update, promo image appears, receipt count advances | Before: default title/image, no handler, count 0. After: `onMessage`, count 1, Campus event update, promo image, and Applied payload: asset=promo | Pass | [T1 before/after composite](evidence/T1-composite.png) |
+| T2 — background tap | Delivered notification is tapped; `onMessageOpenedApp`; fresh receipt and expected UI | Cloud Courier notification appears at 21:05. After opening: `onMessageOpenedApp`, count 2, fresh message ID, Campus event update, promo image, and Applied payload: asset=promo | Pass | [T2 notification/open composite](evidence/T2-composite.png) |
+| T3 — cold-start tap | Notification launches terminated app; `getInitialMessage`; count 1 and expected UI | Notification delivered at 21:09; opened app shows `getInitialMessage`, count 1 on the new launch, fresh message ID, Campus event update, promo image, and Applied payload: asset=promo | Pass | [T3 notification/cold-start composite](evidence/T3-composite.png) |
+| T4 — unsupported asset | `onMessage`; rejection diagnostic; count advances; previous title/image preserved; no crash | `onMessage`, count 2, fresh message ID, visible rejection diagnostic, and the same Campus event update title/promo image as T3; app remains on screen without a crash | Pass | [T4 preserved-content comparison](evidence/T4-composite.png) |
 
 ## T1 device evidence
 
-The original student-supplied screenshots are preserved without image edits. The first
-shows the initial content and receipt count 0. The second shows the foreground receipt
-with count 1 and the resulting title/image. Permission is `authorized` in both.
+Left: initial content and receipt count 0. Right: foreground receipt with count 1 and
+the resulting title/image. Permission is `authorized` in both original screenshots.
 
-**Before the message**
-
-![T1 before: default campus image, no handler, count 0](evidence/T1-before.jpg)
-
-**After the foreground message**
-
-![T1 after: onMessage, count 1, campus event title and promo image](evidence/T1-foreground.jpg)
+![T1 comparison: default content before, onMessage and promo content after](evidence/T1-composite.png)
 
 ## T2 device evidence
 
@@ -100,13 +95,7 @@ subsequent app screenshot shows `onMessageOpenedApp`, receipt count 2, a fresh m
 ID, and the expected campus event content. Reusing the valid payload leaves the title
 and image unchanged; the new handler/count establishes a fresh interaction.
 
-**Delivered notification**
-
-![T2 delivered Cloud Courier campus event notification](evidence/T2-notification.jpg)
-
-**After tapping the notification**
-
-![T2 result: onMessageOpenedApp, count 2, expected campus event content](evidence/T2-background-open.jpg)
+![T2 comparison: delivered notification and onMessageOpenedApp result](evidence/T2-composite.png)
 
 ## T3 device evidence
 
@@ -115,13 +104,16 @@ The notification screenshot precedes the app screenshot displaying
 and promo image are applied on the new launch. This distinguishes the cold-start
 notification-open path from T2's background-open listener.
 
-**Delivered notification**
+![T3 comparison: delivered notification and getInitialMessage result](evidence/T3-composite.png)
 
-![T3 notification delivered before the cold-start tap](evidence/T3-notification.jpg)
+## T4 device evidence
 
-**After launching through the notification**
+T3's app screenshot is reused as the before state: title Campus event update, promo
+image, count 1. After sending `action=update_ui` with `asset=unknown` while foregrounded,
+T4 shows `onMessage`, count 2, a fresh message ID, and the rejection diagnostic. The
+previous title and image are preserved, and the app remains on screen without a crash.
 
-![T3 result: getInitialMessage, count 1, expected campus event content](evidence/T3-cold-start.jpg)
+![T4 comparison: valid content before, rejected payload preserving content after](evidence/T4-composite.png)
 
 ## Checks actually performed
 
@@ -136,9 +128,10 @@ notification-open path from T2's background-open listener.
   safe callbacks after disposal.
 
 The automated tests use a fake messaging service and do not substitute for T1–T4.
-T1–T3 now have real device evidence, and Android permission is visibly authorized. T4
-device evidence remains missing. This document and repository do not establish an
-LMS upload or completion of every required device test.
+T1-T4 now have real device evidence, and Android permission is visibly authorized.
+Results apply to the recorded Samsung/Android target and notification-plus-data payload;
+no second-platform or data-only background-delivery result is claimed. This document
+and repository do not establish an LMS upload.
 
 ## Practice Arena answers
 
@@ -167,8 +160,8 @@ LMS upload or completion of every required device test.
   Terminated app → delivered notification → tap/launch → `getInitialMessage()` → widget
   update. Separately delivered background work → top-level `onBackgroundMessage` →
   bounded non-UI processing; it is not a notification-open event.
-- **Payload Validator:** The automated unsupported-asset case demonstrates rejection
-  and preservation; the required device demonstration is still unavailable.
+- **Payload Validator:** T4's device result and its comparison with T3 demonstrate
+  rejection and preservation. Automated tests also cover missing/malformed assets.
 - **Evidence Builder:** The JSON and four rows above define reproducible device checks.
   A send confirmation or build success alone would not prove receipt or a UI reaction.
 - **Design Critic:** The claim that every background notification immediately changes
@@ -183,7 +176,7 @@ LMS upload or completion of every required device test.
 - **Optional payload detail:** Both required custom values are strings. Unsupported
   actions, missing assets, unknown asset names, and non-string asset values are rejected.
   The notification body is informational; the two data keys determine the UI action.
-- **Optional improvement detail:** After collecting the four device results, add event-ID
+- **Optional improvement detail:** With all four device results recorded, add event-ID
   deduplication if repeated notifications trigger business operations. Measure success
   through one operation for repeated IDs and separate operations for distinct IDs.
 
