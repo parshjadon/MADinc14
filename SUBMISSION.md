@@ -26,28 +26,28 @@ token nor successful message delivery grants authorization to protected resource
 notification tap, and `getInitialMessage()` handles a notification-triggered cold start.
 The separate `onBackgroundMessage` callback performs non-UI work; Android runs it in
 another isolate, so it cannot update foreground widget state. Automated callback tests
-verify UI changes and initial-message retention, but do not prove cloud delivery or
-notification taps. T1–T4 below therefore remain blocked. Android force-stop prevents
-delivery until reopening, and behavior on one device would not establish universal
-platform reliability.
+verify UI behavior. The linked T1 before/after screenshots show `onMessage`, count 1,
+and the promo image replacing default content. T2–T4 still await device evidence.
+Android force-stop prevents delivery until reopening; one device's results cannot
+establish universal platform reliability.
 
 ### 3. Validation and next step
 
 T4 uses `asset=unknown`. Automated checks observe a rejection diagnostic while the
 previous title/image survive and receipt metadata advances. Lifetime guards prevent
 late callbacks from changing disposed widgets; service disposal cancels listeners.
-The next step is a Google Play-enabled Android device run: success requires all four
-recorded handler/UI results, including T4's before/after comparison. AI assistance
-produced the implementation, automated tests, and written responses; no device evidence
-is claimed.
+The next step is recording T2–T4 on the connected phone, including T4's before/after
+comparison. AI assisted the implementation, automated tests, and written responses;
+the student supplied the T1 device screenshots.
 
 ## Device, permission, and payload record
 
 - **Available environment:** Windows host; Flutter 3.47.2; Dart 3.13.2.
-- **Device/OS:** No Android or iOS device was connected. `flutter devices` listed only
-  Windows, Chrome, and Edge; `flutter emulators` reported no available emulators.
-- **Permission status:** Not observed on Android; no authorization claim is made.
-- **Device token:** Not obtained; no token is included in this repository.
+- **Device/OS:** Samsung SM-S938U1, Android 17, read from the connected device through
+  ADB. The student's screenshots show the app running on the phone.
+- **Permission status:** `authorized`, visible in both T1 screenshots.
+- **Device token:** The app reports a token is available; the before screenshot shows
+  the copy action succeeded. The full token is hidden and is not included here.
 - **Valid payload:** notification plus custom string data, as shown below.
 - **T4 change:** Replace only `data.asset` with the string `unknown`.
 
@@ -72,10 +72,24 @@ remain outside the Flutter application.
 
 | Test | Expected handler/result | Observed result | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| T1 — foreground | `onMessage`; title becomes Campus event update, promo image appears, receipt count advances | No target device available; no real FCM receipt observed | Blocked | No device recording/screenshot captured |
-| T2 — background tap | Delivered notification is tapped; `onMessageOpenedApp`; fresh receipt and expected UI | No target device available; no system notification or tap observed | Blocked | No device recording/screenshot captured |
-| T3 — cold-start tap | Notification launches terminated app; `getInitialMessage`; count 1 and expected UI | No target device available; notification-triggered startup unobserved | Blocked | No device recording/screenshot captured |
-| T4 — unsupported asset | `onMessage`; rejection diagnostic; count advances; previous title/image preserved; no crash | Callback/UI test passed with `asset=unknown`; real device delivery remains unobserved | Blocked for required device test | [Automated validation test](test/message_handling_test.dart); no device evidence |
+| T1 — foreground | `onMessage`; title becomes Campus event update, promo image appears, receipt count advances | Before: default title/image, no handler, count 0. After: `onMessage`, count 1, Campus event update, promo image, and Applied payload: asset=promo | Pass | [Before](evidence/T1-before.jpg), [foreground result](evidence/T1-foreground.jpg) |
+| T2 — background tap | Delivered notification is tapped; `onMessageOpenedApp`; fresh receipt and expected UI | No device screenshot/recording supplied for this path yet | Pending evidence | Not supplied |
+| T3 — cold-start tap | Notification launches terminated app; `getInitialMessage`; count 1 and expected UI | No device screenshot/recording supplied for this path yet | Pending evidence | Not supplied |
+| T4 — unsupported asset | `onMessage`; rejection diagnostic; count advances; previous title/image preserved; no crash | Callback/UI test passed with `asset=unknown`; real device rejection has not yet been evidenced | Pending device evidence | [Automated validation test](test/message_handling_test.dart); device evidence not supplied |
+
+## T1 device evidence
+
+The original student-supplied screenshots are preserved without image edits. The first
+shows the initial content and receipt count 0. The second shows the foreground receipt
+with count 1 and the resulting title/image. Permission is `authorized` in both.
+
+**Before the message**
+
+![T1 before: default campus image, no handler, count 0](evidence/T1-before.jpg)
+
+**After the foreground message**
+
+![T1 after: onMessage, count 1, campus event title and promo image](evidence/T1-foreground.jpg)
 
 ## Checks actually performed
 
@@ -90,9 +104,9 @@ remain outside the Flutter application.
   safe callbacks after disposal.
 
 The automated tests use a fake messaging service and do not substitute for T1–T4.
-Actual delivery/UI evidence and Android notification permission remain missing. This
-document and repository do not establish an LMS upload or a completed device-based
-submission.
+T1 now has real device evidence, and Android permission is visibly authorized. T2–T4
+device evidence remains missing. This document and repository do not establish an
+LMS upload or completion of every required device test.
 
 ## Practice Arena answers
 
@@ -127,8 +141,8 @@ submission.
   A send confirmation or build success alone would not prove receipt or a UI reaction.
 - **Design Critic:** The claim that every background notification immediately changes
   widgets is incorrect. Firebase distinguishes background work from notification-open
-  handling. Automated callbacks support the UI-side distinction; actual OS delivery/tap
-  behavior has not been tested here. See [Firebase's message-handling guide](https://firebase.google.com/docs/cloud-messaging/flutter/receive-messages).
+  handling. Automated callbacks support the UI-side distinction; background delivery
+  and notification taps are not yet evidenced. See [Firebase's message-handling guide](https://firebase.google.com/docs/cloud-messaging/flutter/receive-messages).
 - **Repeat-send trade-off:** Reapplying the same content is harmless in this sample;
   receipt metadata still advances. A production workflow with side effects should use
   an application event ID and durable deduplication, tested by sending the same event
