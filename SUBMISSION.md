@@ -28,7 +28,8 @@ The separate `onBackgroundMessage` callback performs non-UI work; Android runs i
 another isolate, so it cannot update foreground widget state. Automated callback tests
 verify UI behavior. T1 screenshots show `onMessage`, count 1, and the promo image.
 T2 shows the delivered notification, then `onMessageOpenedApp`, count 2, and expected
-content. T3–T4 still await device evidence.
+content. T3 shows `getInitialMessage`, count 1, and expected content after a new launch.
+T4 still awaits device evidence.
 Android force-stop prevents delivery until reopening; one device's results cannot
 establish universal platform reliability.
 
@@ -37,9 +38,9 @@ establish universal platform reliability.
 T4 uses `asset=unknown`. Automated checks observe a rejection diagnostic while the
 previous title/image survive and receipt metadata advances. Lifetime guards prevent
 late callbacks from changing disposed widgets; service disposal cancels listeners.
-The next step is recording T3–T4 on the connected phone, including T4's before/after
+The next step is recording T4 on the connected phone, including its before/after
 comparison. AI assisted the implementation, automated tests, and written responses;
-the student supplied the T1–T2 device screenshots.
+the student supplied the T1–T3 device screenshots.
 
 ## Device, permission, and payload record
 
@@ -75,7 +76,7 @@ remain outside the Flutter application.
 | --- | --- | --- | --- | --- |
 | T1 — foreground | `onMessage`; title becomes Campus event update, promo image appears, receipt count advances | Before: default title/image, no handler, count 0. After: `onMessage`, count 1, Campus event update, promo image, and Applied payload: asset=promo | Pass | [Before](evidence/T1-before.jpg), [foreground result](evidence/T1-foreground.jpg) |
 | T2 — background tap | Delivered notification is tapped; `onMessageOpenedApp`; fresh receipt and expected UI | Cloud Courier notification appears at 21:05. After opening: `onMessageOpenedApp`, count 2, fresh message ID, Campus event update, promo image, and Applied payload: asset=promo | Pass | [Delivered notification](evidence/T2-notification.jpg), [background-open result](evidence/T2-background-open.jpg) |
-| T3 — cold-start tap | Notification launches terminated app; `getInitialMessage`; count 1 and expected UI | No device screenshot/recording supplied for this path yet | Pending evidence | Not supplied |
+| T3 — cold-start tap | Notification launches terminated app; `getInitialMessage`; count 1 and expected UI | Notification delivered at 21:09; opened app shows `getInitialMessage`, count 1 on the new launch, fresh message ID, Campus event update, promo image, and Applied payload: asset=promo | Pass | [Delivered notification](evidence/T3-notification.jpg), [cold-start result](evidence/T3-cold-start.jpg) |
 | T4 — unsupported asset | `onMessage`; rejection diagnostic; count advances; previous title/image preserved; no crash | Callback/UI test passed with `asset=unknown`; real device rejection has not yet been evidenced | Pending device evidence | [Automated validation test](test/message_handling_test.dart); device evidence not supplied |
 
 ## T1 device evidence
@@ -107,6 +108,21 @@ and image unchanged; the new handler/count establishes a fresh interaction.
 
 ![T2 result: onMessageOpenedApp, count 2, expected campus event content](evidence/T2-background-open.jpg)
 
+## T3 device evidence
+
+The notification screenshot precedes the app screenshot displaying
+`getInitialMessage`, receipt count 1, and a new message ID. The campus event title
+and promo image are applied on the new launch. This distinguishes the cold-start
+notification-open path from T2's background-open listener.
+
+**Delivered notification**
+
+![T3 notification delivered before the cold-start tap](evidence/T3-notification.jpg)
+
+**After launching through the notification**
+
+![T3 result: getInitialMessage, count 1, expected campus event content](evidence/T3-cold-start.jpg)
+
 ## Checks actually performed
 
 - FlutterFire registered/configured the Android app against the stated project.
@@ -120,7 +136,7 @@ and image unchanged; the new handler/count establishes a fresh interaction.
   safe callbacks after disposal.
 
 The automated tests use a fake messaging service and do not substitute for T1–T4.
-T1–T2 now have real device evidence, and Android permission is visibly authorized. T3–T4
+T1–T3 now have real device evidence, and Android permission is visibly authorized. T4
 device evidence remains missing. This document and repository do not establish an
 LMS upload or completion of every required device test.
 
@@ -158,7 +174,8 @@ LMS upload or completion of every required device test.
 - **Design Critic:** The claim that every background notification immediately changes
   widgets is incorrect. Firebase distinguishes background work from notification-open
   handling. T2's notification and `onMessageOpenedApp` screenshots support the
-  background-tap path; cold-start behavior still awaits T3 evidence. See [Firebase's message-handling guide](https://firebase.google.com/docs/cloud-messaging/flutter/receive-messages).
+  background-tap path. T3 separately shows the cold-start `getInitialMessage` result.
+  See [Firebase's message-handling guide](https://firebase.google.com/docs/cloud-messaging/flutter/receive-messages).
 - **Repeat-send trade-off:** Reapplying the same content is harmless in this sample;
   receipt metadata still advances. A production workflow with side effects should use
   an application event ID and durable deduplication, tested by sending the same event
